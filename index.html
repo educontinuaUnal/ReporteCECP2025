@@ -12,7 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     
-    <!-- Proj4js (Requerido para ubicar puntos lat/lon en el mapa) -->
+    <!-- Proj4js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.15/proj4.js"></script>
     
     <!-- Highcharts Maps -->
@@ -32,16 +32,19 @@
             border: 1px solid #e2e8f0; 
             border-radius: 12px; 
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
-            transition: transform 0.2s ease-in-out;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
         }
 
-        /* Efecto sutil al pasar el mouse para web */
         .card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        /* Estilos específicos para impresión (Ctrl + P) */
+        /* Clase para ocultar gráficas antes de animar */
+        .chart-container-hidden canvas {
+            opacity: 0;
+        }
+
         @media print {
             body { background: white; -webkit-print-color-adjust: exact; padding: 0; margin: 0; }
             .no-print { display: none !important; }
@@ -55,7 +58,7 @@
 </head>
 <body id="report-content" class="py-8">
 
-    <!-- Título Principal del Documento -->
+    <!-- Título Principal -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-b-2 border-slate-800 pb-4">
             <div>
@@ -75,12 +78,12 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         
-        <!-- KPIs -->
+        <!-- KPIs Animados -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="card p-5 border-l-4 border-blue-500">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Total Inscritos</p>
                 <div class="flex items-center gap-2">
-                    <h2 class="text-3xl font-extrabold text-slate-800">2,102</h2>
+                    <h2 class="text-3xl font-extrabold text-slate-800 counter-anim" data-target="2102">0</h2>
                     <i class="fa-solid fa-users text-blue-100 text-xl ml-auto"></i>
                 </div>
             </div>
@@ -88,7 +91,7 @@
             <div class="card p-5 border-l-4 border-pink-500">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Participación Femenina</p>
                 <div class="flex items-center gap-2">
-                    <h2 class="text-3xl font-extrabold text-slate-800">64%</h2>
+                    <h2 class="text-3xl font-extrabold text-slate-800 counter-anim" data-target="64" data-suffix="%">0%</h2>
                     <i class="fa-solid fa-venus text-pink-100 text-xl ml-auto"></i>
                 </div>
             </div>
@@ -96,7 +99,7 @@
             <div class="card p-5 border-l-4 border-orange-500">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Programas Ofertados</p>
                 <div class="flex items-end justify-between">
-                    <h2 class="text-3xl font-extrabold text-slate-800">64</h2>
+                    <h2 class="text-3xl font-extrabold text-slate-800 counter-anim" data-target="64">0</h2>
                     <span class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded-full border border-orange-100">Finalizados</span>
                 </div>
             </div>
@@ -105,12 +108,12 @@
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Cobertura Principal</p>
                 <div class="flex items-end justify-between">
                     <h2 class="text-xl font-extrabold text-slate-800 truncate">Bogotá D.C.</h2>
-                    <span class="text-xs text-slate-400">68% del total</span>
+                    <span class="text-xs text-slate-400 counter-anim" data-target="68" data-suffix="% del total">0%</span>
                 </div>
             </div>
         </div>
 
-        <!-- Sección Mapa -->
+        <!-- Mapa -->
         <div class="card p-6 mb-8 bg-white">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                 <div>
@@ -118,53 +121,40 @@
                         <i class="fa-solid fa-earth-americas text-emerald-600"></i> Cobertura Nacional
                     </h3>
                 </div>
-                <!-- Leyenda de colores explicita -->
                 <div class="flex gap-4 text-xs mt-2 md:mt-0 font-medium">
-                    <div class="flex items-center gap-1">
-                        <span class="w-3 h-3 rounded bg-[#064e3b] border border-gray-200"></span> 
-                        Alta (>1000)
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <span class="w-3 h-3 rounded bg-[#34d399] border border-gray-200"></span> 
-                        Media (50-999)
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <span class="w-3 h-3 rounded bg-[#ecfdf5] border border-gray-200"></span> 
-                        Baja (<50)
-                    </div>
+                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-[#064e3b] border border-gray-200"></span> Alta (>1000)</div>
+                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-[#34d399] border border-gray-200"></span> Media (50-999)</div>
+                    <div class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-[#ecfdf5] border border-gray-200"></span> Baja (<50)</div>
                 </div>
             </div>
             
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Mapa Container -->
                 <div class="lg:col-span-2 h-[400px] rounded-xl overflow-hidden bg-white border border-slate-100 relative">
                     <div id="colombiaMap" class="w-full h-full"></div>
                 </div>
-                
-                <!-- Top 5 Tabla -->
                 <div class="lg:col-span-1 flex flex-col justify-center">
                     <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
                         <h4 class="text-xs font-bold text-slate-500 uppercase mb-4 tracking-wider">Top 5 Departamentos</h4>
                         <div class="space-y-4">
                             <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                                 <span class="font-bold text-sm text-slate-700">1. BOGOTÁ D.C.</span>
-                                <span class="font-bold text-white bg-[#064e3b] px-2 py-0.5 rounded text-xs">1,432</span>
+                                <span class="font-bold text-white bg-[#064e3b] px-2 py-0.5 rounded text-xs counter-anim" data-target="1432">0</span>
                             </div>
                             <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                                 <span class="font-semibold text-sm text-slate-600">2. ANTIOQUIA</span>
-                                <span class="font-bold text-slate-800 bg-[#34d399] px-2 py-0.5 rounded text-xs">400</span>
+                                <span class="font-bold text-slate-800 bg-[#34d399] px-2 py-0.5 rounded text-xs counter-anim" data-target="400">0</span>
                             </div>
                             <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                                 <span class="font-semibold text-sm text-slate-600">3. CUNDINAMARCA</span>
-                                <span class="font-bold text-slate-800 bg-[#34d399] px-2 py-0.5 rounded text-xs">192</span>
+                                <span class="font-bold text-slate-800 bg-[#34d399] px-2 py-0.5 rounded text-xs counter-anim" data-target="192">0</span>
                             </div>
                             <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                                 <span class="font-semibold text-sm text-slate-600">4. SANTANDER</span>
-                                <span class="font-bold text-slate-600 bg-[#ecfdf5] px-2 py-0.5 rounded text-xs">9</span>
+                                <span class="font-bold text-slate-600 bg-[#ecfdf5] px-2 py-0.5 rounded text-xs counter-anim" data-target="9">0</span>
                             </div>
                             <div class="flex justify-between items-center pb-1">
                                 <span class="font-semibold text-sm text-slate-600">5. BOYACÁ</span>
-                                <span class="font-bold text-slate-600 bg-[#ecfdf5] px-2 py-0.5 rounded text-xs">7</span>
+                                <span class="font-bold text-slate-600 bg-[#ecfdf5] px-2 py-0.5 rounded text-xs counter-anim" data-target="7">0</span>
                             </div>
                         </div>
                     </div>
@@ -172,10 +162,10 @@
             </div>
         </div>
 
-        <!-- Gráficas Detalladas (Grid Superior) -->
+        <!-- Gráficas Detalladas (Observadas para Scroll) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Edades -->
-            <div class="card p-6 bg-white">
+            <div class="card p-6 bg-white chart-container-hidden" data-chart="age">
                 <div class="mb-6 flex justify-between items-center">
                     <div>
                         <h3 class="text-lg font-bold text-slate-800">Perfil por Edad</h3>
@@ -192,7 +182,7 @@
             </div>
 
             <!-- Eficiencia -->
-            <div class="card p-6 bg-white">
+            <div class="card p-6 bg-white chart-container-hidden" data-chart="efficiency">
                 <div class="mb-6 flex justify-between items-center">
                     <div>
                         <h3 class="text-lg font-bold text-slate-800">Eficiencia por Modalidad</h3>
@@ -209,8 +199,8 @@
             </div>
         </div>
 
-        <!-- Nueva Gráfica: Comparativo por Proyecto (Ancho Completo) -->
-        <div class="card p-6 mb-8 bg-white">
+        <!-- Comparativo Proyectos -->
+        <div class="card p-6 mb-8 bg-white chart-container-hidden" data-chart="project">
             <div class="mb-6 flex justify-between items-center">
                 <div>
                     <h3 class="text-lg font-bold text-slate-800">Balance por Proyecto</h3>
@@ -231,26 +221,24 @@
             </div>
         </div>
 
-        <!-- Género y Footer -->
+        <!-- Género -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <!-- Género -->
-            <div class="card p-6 md:col-span-1 bg-white">
+            <div class="card p-6 md:col-span-1 bg-white chart-container-hidden" data-chart="gender">
                 <h3 class="text-lg font-bold text-slate-800 mb-4 text-center">Género</h3>
                 <div class="h-40 relative flex justify-center items-center">
                     <canvas id="genderChart"></canvas>
-                    <!-- Overlay para porcentaje central -->
                     <div class="absolute flex flex-col items-center justify-center pointer-events-none">
-                        <span class="text-3xl font-extrabold text-pink-600 leading-none">64%</span>
+                        <span class="text-3xl font-extrabold text-pink-600 leading-none counter-anim" data-target="64" data-suffix="%">0%</span>
                         <span class="text-xs font-bold text-slate-400 uppercase">Fem</span>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2 mt-4 text-center">
                     <div class="bg-pink-50 p-2 rounded border border-pink-100">
-                        <span class="block text-xl font-bold text-pink-600">1,343</span>
+                        <span class="block text-xl font-bold text-pink-600 counter-anim" data-target="1343">0</span>
                         <span class="text-xs text-pink-400 font-semibold">FEMENINO</span>
                     </div>
                     <div class="bg-blue-50 p-2 rounded border border-blue-100">
-                        <span class="block text-xl font-bold text-blue-600">759</span>
+                        <span class="block text-xl font-bold text-blue-600 counter-anim" data-target="759">0</span>
                         <span class="text-xs text-blue-400 font-semibold">MASCULINO</span>
                     </div>
                 </div>
@@ -262,298 +250,182 @@
                 <div class="space-y-4 text-sm font-light">
                     <p class="flex gap-3">
                         <i class="fa-solid fa-check-circle text-emerald-400 mt-1"></i>
-                        <span>
-                            <strong class="text-emerald-300">Dominio de Extensión:</strong> Los Cursos Cortos y Diplomados están perfectamente equilibrados en demanda (1024 vs 1019 inscritos), validando la estrategia de diversificación de portafolio.
-                        </span>
+                        <span><strong class="text-emerald-300">Dominio de Extensión:</strong> Cursos y Diplomados equilibrados en demanda, validando diversificación.</span>
                     </p>
                     <p class="flex gap-3">
                         <i class="fa-solid fa-check-circle text-blue-400 mt-1"></i>
-                        <span>
-                            <strong class="text-blue-300">Mercado Laboral Activo:</strong> El pico en el rango de 30-39 años sugiere que el CECP está atendiendo principalmente a profesionales que buscan actualización laboral inmediata, más que a estudiantes de pregrado.
-                        </span>
+                        <span><strong class="text-blue-300">Mercado Laboral Activo:</strong> Pico en 30-39 años, profesionales buscando actualización inmediata.</span>
                     </p>
                     <p class="flex gap-3">
                         <i class="fa-solid fa-check-circle text-orange-400 mt-1"></i>
-                        <span>
-                            <strong class="text-orange-300">Oportunidad Regional:</strong> Fuera del eje Bogotá-Antioquia, la participación es menor al 10%. Existe una oportunidad clara de expansión virtual hacia el Valle y la Costa Caribe.
-                        </span>
+                        <span><strong class="text-orange-300">Oportunidad Regional:</strong> Expansión virtual necesaria hacia Valle y Costa Caribe.</span>
                     </p>
                 </div>
             </div>
         </div>
         
-        <!-- Footer visible en Web y Print -->
         <div class="mt-8 border-t border-gray-300 pt-4 text-center text-xs text-slate-400 pb-8">
             Este documento es oficial para el año 2025. Generado para visualización web.
         </div>
-
     </div>
 
     <!-- Scripts -->
     <script>
-        // Actualizar fecha actual
         document.getElementById('currentDate').innerText = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long' });
 
-        // Etiquetas activas
         Chart.register(ChartDataLabels);
-
-        // Paleta estándar
-        const palette = {
-            blue: '#2563eb',
-            indigo: '#4f46e5',
-            pink: '#db2777',
-            orange: '#ea580c',
-            emerald: '#10b981',
-            slate: '#64748b'
-        };
-
-        const mapColors = {
-            high: '#064e3b',
-            medium: '#34d399',
-            low: '#ecfdf5'
-        };
-
+        const palette = { blue: '#2563eb', indigo: '#4f46e5', pink: '#db2777', orange: '#ea580c', emerald: '#10b981', slate: '#64748b' };
         Chart.defaults.font.family = "'Manrope', sans-serif";
         Chart.defaults.color = '#475569';
         Chart.defaults.font.size = 11;
 
-        // --- 1. CONFIGURACIÓN DEL MAPA ---
-        const mapData = [
-            ['co-dc', 1432], ['co-an', 400], ['co-cu', 192], ['co-sa', 9],
-            ['co-by', 7], ['co-cl', 7], ['co-vc', 6], ['co-hu', 4],
-            ['co-me', 4], ['co-co', 4], ['co-ca', 4], ['co-at', 3],
-            ['co-ri', 3], ['co-to', 3], ['co-na', 3], ['co-ns', 2],
-            ['co-ce', 2], ['co-pu', 2], ['co-sap', 2], ['co-ch', 1],
-            ['co-bo', 1], ['co-su', 1], ['co-qu', 1]
-        ];
-
-        Highcharts.mapChart('colombiaMap', {
-            chart: {
-                map: 'countries/co/co-all',
-                backgroundColor: 'transparent',
-                style: { fontFamily: "'Manrope', sans-serif" }
-            },
-            title: { text: '' },
-            mapNavigation: { enabled: false },
-            colorAxis: {
-                dataClasses: [{
-                    to: 50,
-                    color: mapColors.low,
-                    name: 'Baja (<50)'
-                }, {
-                    from: 50,
-                    to: 1000,
-                    color: mapColors.medium,
-                    name: 'Media (50-1000)'
-                }, {
-                    from: 1000,
-                    color: mapColors.high,
-                    name: 'Alta (>1000)'
-                }]
-            },
-            series: [
-                {
-                    data: mapData,
-                    name: 'Estudiantes',
-                    borderColor: '#94a3b8',
-                    borderWidth: 0.5,
-                    nullColor: '#f8fafc',
-                    states: { hover: { color: palette.blue } },
-                    dataLabels: { enabled: false }
-                },
-                {
-                    type: 'mappoint',
-                    name: 'Referencia',
-                    color: '#064e3b',
-                    data: [{
-                        name: 'Bogotá D.C.',
-                        lat: 4.6097,
-                        lon: -74.0817,
-                        dataLabels: { enabled: false }
-                    }],
-                    marker: {
-                        lineWidth: 2,
-                        lineColor: '#ffffff',
-                        radius: 6,
-                        symbol: 'circle'
-                    },
-                    tooltip: {
-                        headerFormat: '',
-                        pointFormat: '<b>{point.name}</b><br>Capital y Sede Principal'
+        // --- 1. CONFIGURACIÓN ANIMACIÓN NÚMEROS (COUNTER UP) ---
+        const initCounters = () => {
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const el = entry.target;
+                        const target = parseInt(el.getAttribute('data-target'));
+                        const suffix = el.getAttribute('data-suffix') || '';
+                        animateCounter(el, target, suffix);
+                        obs.unobserve(el);
                     }
-                }
-            ],
-            legend: { enabled: false },
-            tooltip: { enabled: true, headerFormat: '', pointFormat: '<b>{point.name}</b>: {point.value}' }
-        });
+                });
+            }, { threshold: 0.5 });
 
-        // --- 2. GRÁFICA EDADES ---
-        new Chart(document.getElementById('ageChart'), {
-            type: 'bar',
-            data: {
-                labels: ['< 20', '20 - 29', '30 - 39', '40 - 49', '> 50'],
-                datasets: [{
-                    label: 'Estudiantes',
-                    data: [76, 534, 678, 509, 304],
-                    backgroundColor: [
-                        '#c7d2fe', '#818cf8', 
-                        palette.indigo, 
-                        '#6366f1', '#a5b4fc'
-                    ],
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    datalabels: {
-                        anchor: 'end', align: 'top', color: '#475569', font: { weight: 'bold' }
-                    }
-                },
-                scales: {
-                    y: { display: false, max: 800 },
-                    x: { grid: { display: false } }
-                }
+            function animateCounter(el, target, suffix) {
+                let startTimestamp = null;
+                const duration = 2000;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+                    el.innerText = Math.floor(easeProgress * target).toLocaleString('es-CO') + suffix;
+                    if (progress < 1) window.requestAnimationFrame(step);
+                    else el.innerText = target.toLocaleString('es-CO') + suffix;
+                };
+                window.requestAnimationFrame(step);
             }
-        });
+            document.querySelectorAll('.counter-anim').forEach(el => observer.observe(el));
+        };
 
-        // --- 3. GRÁFICA EFICIENCIA (Modalidad) ---
-        new Chart(document.getElementById('efficiencyChart'), {
-            type: 'bar',
-            data: {
-                labels: ['Cursos Ext.', 'Diplomados', 'Talleres'],
-                datasets: [
-                    {
-                        label: 'Inscritos (Demanda)',
-                        data: [1024, 1019, 59],
-                        backgroundColor: palette.blue,
-                        yAxisID: 'y',
-                        order: 2,
-                        borderRadius: 4,
-                        datalabels: { color: 'white', anchor: 'center', align: 'center' }
+        // --- 2. CONFIGURACIÓN GRÁFICAS ON-SCROLL ---
+        // Definición de las gráficas (Funciones constructoras)
+        const chartsConfig = {
+            age: (ctx) => new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['< 20', '20 - 29', '30 - 39', '40 - 49', '> 50'],
+                    datasets: [{
+                        label: 'Estudiantes',
+                        data: [76, 534, 678, 509, 304],
+                        backgroundColor: ['#c7d2fe', '#818cf8', palette.indigo, '#6366f1', '#a5b4fc'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart',
+                        delay: (context) => context.type === 'data' && context.mode === 'default' ? context.dataIndex * 200 : 0 // Efecto escalonado
                     },
-                    {
-                        label: 'Programas (Oferta)',
-                        data: [31, 29, 4],
-                        type: 'line',
-                        borderColor: palette.orange,
-                        backgroundColor: palette.orange,
-                        borderWidth: 2,
-                        pointRadius: 5,
-                        yAxisID: 'y1',
-                        order: 1,
-                        datalabels: { 
-                            align: 'top', 
-                            color: palette.orange, 
-                            backgroundColor: 'white', 
-                            borderRadius: 4,
-                            font: {weight: 'bold'}
+                    plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', color: '#475569', font: { weight: 'bold' } } },
+                    scales: { y: { display: false, max: 800 }, x: { grid: { display: false } } }
+                }
+            }),
+            efficiency: (ctx) => new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Cursos Ext.', 'Diplomados', 'Talleres'],
+                    datasets: [
+                        { label: 'Inscritos', data: [1024, 1019, 59], backgroundColor: palette.blue, yAxisID: 'y', order: 2, borderRadius: 4, datalabels: { color: 'white' } },
+                        { label: 'Programas', data: [31, 29, 4], type: 'line', borderColor: palette.orange, backgroundColor: palette.orange, borderWidth: 2, yAxisID: 'y1', order: 1, datalabels: { align: 'top', color: palette.orange, backgroundColor: 'white', borderRadius: 4 } }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutBounce', // Rebote divertido para las líneas
+                    },
+                    plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+                    scales: { y: { display: false }, y1: { display: false, position: 'right', min: 0, max: 50 }, x: { grid: { display: false } } }
+                }
+            }),
+            project: (ctx) => new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Colsubsidio', 'Oferta CECP'],
+                    datasets: [
+                        { label: 'Inscritos', data: [965, 1137], backgroundColor: palette.blue, borderRadius: 6, barPercentage: 0.5, yAxisID: 'yInscritos', order: 2, datalabels: { color: 'white' } },
+                        { label: 'Programas', data: [27, 37], type: 'line', borderColor: palette.emerald, backgroundColor: palette.emerald, borderWidth: 2, yAxisID: 'yProgramas', order: 1, datalabels: { align: 'top', color: palette.emerald, backgroundColor: 'white', borderRadius: 4 } }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: {
+                        duration: 1500,
+                        delay: (context) => context.type === 'data' && context.mode === 'default' ? context.dataIndex * 300 : 0
+                    },
+                    plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+                    scales: { yInscritos: { display: false }, yProgramas: { display: false, min: 0, max: 50 }, x: { grid: { display: false } } }
+                }
+            }),
+            gender: (ctx) => new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: ['Femenino', 'Masculino'], datasets: [{ data: [1343, 759], backgroundColor: [palette.pink, palette.blue], borderWidth: 0 }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '75%',
+                    animation: { animateScale: true, animateRotate: true, duration: 2000 },
+                    plugins: { legend: { display: false }, datalabels: { display: false } }
+                }
+            })
+        };
+
+        const initChartsObserver = () => {
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const container = entry.target;
+                        const chartType = container.getAttribute('data-chart');
+                        const canvas = container.querySelector('canvas');
+                        
+                        if (chartsConfig[chartType]) {
+                            // Crear gráfica
+                            chartsConfig[chartType](canvas);
+                            // Hacer visible suavemente
+                            container.classList.remove('chart-container-hidden');
+                            canvas.style.opacity = 1;
+                            canvas.style.transition = 'opacity 0.5s ease-in';
                         }
+                        obs.unobserve(container);
                     }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'top', labels: { usePointStyle: true } }
-                },
-                scales: {
-                    y: { display: false },
-                    y1: { display: false, position: 'right', min: 0, max: 50 },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
+                });
+            }, { threshold: 0.3 }); // Se activa cuando el 30% de la gráfica es visible
 
-        // --- 4. NUEVA GRÁFICA: COMPARATIVO PROYECTOS ---
-        new Chart(document.getElementById('projectChart'), {
-            type: 'bar',
-            data: {
-                labels: ['Convenio Colsubsidio', 'Oferta CECP'],
-                datasets: [
-                    {
-                        label: 'Inscritos (Volumen)',
-                        data: [965, 1137], // Datos reales extraídos
-                        backgroundColor: palette.blue,
-                        borderRadius: 6,
-                        barPercentage: 0.5,
-                        yAxisID: 'yInscritos',
-                        order: 2,
-                        datalabels: { color: 'white', anchor: 'center', align: 'center' }
-                    },
-                    {
-                        label: 'Cantidad Programas',
-                        data: [27, 37], // Datos reales extraídos
-                        type: 'line',
-                        borderColor: palette.emerald,
-                        backgroundColor: palette.emerald,
-                        borderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        yAxisID: 'yProgramas',
-                        order: 1,
-                        datalabels: { 
-                            align: 'top', 
-                            color: palette.emerald, 
-                            backgroundColor: 'white', 
-                            borderRadius: 4,
-                            font: {weight: 'bold'}
-                        }
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                plugins: {
-                    legend: { position: 'top', labels: { usePointStyle: true } }
-                },
-                scales: {
-                    yInscritos: {
-                        type: 'linear',
-                        display: false,
-                        position: 'left',
-                        title: { display: true, text: 'Inscritos' }
-                    },
-                    yProgramas: {
-                        type: 'linear',
-                        display: false, // Ocultamos ejes para limpieza, usamos etiquetas
-                        position: 'right',
-                        min: 0,
-                        max: 50
-                    },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
+            document.querySelectorAll('.chart-container-hidden').forEach(el => observer.observe(el));
+        };
 
-        // --- 5. GRÁFICA GÉNERO ---
-        new Chart(document.getElementById('genderChart'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Femenino', 'Masculino'],
-                datasets: [{
-                    data: [1343, 759],
-                    backgroundColor: [palette.pink, palette.blue],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '75%',
-                plugins: {
-                    legend: { display: false },
-                    datalabels: { display: false }
-                }
-            }
+        // --- 3. MAPA (Carga inmediata, está arriba) ---
+        const initMap = () => {
+            Highcharts.mapChart('colombiaMap', {
+                chart: { map: 'countries/co/co-all', backgroundColor: 'transparent', style: { fontFamily: "'Manrope', sans-serif" } },
+                title: { text: '' }, mapNavigation: { enabled: false },
+                colorAxis: { dataClasses: [{ to: 50, color: '#ecfdf5', name: 'Baja' }, { from: 50, to: 1000, color: '#34d399', name: 'Media' }, { from: 1000, color: '#064e3b', name: 'Alta' }] },
+                series: [
+                    { data: [['co-dc', 1432], ['co-an', 400], ['co-cu', 192], ['co-sa', 9], ['co-by', 7], ['co-cl', 7], ['co-vc', 6], ['co-hu', 4], ['co-me', 4], ['co-co', 4], ['co-ca', 4], ['co-at', 3], ['co-ri', 3], ['co-to', 3], ['co-na', 3], ['co-ns', 2], ['co-ce', 2], ['co-pu', 2], ['co-sap', 2], ['co-ch', 1], ['co-bo', 1], ['co-su', 1], ['co-qu', 1]], borderColor: '#94a3b8', borderWidth: 0.5, nullColor: '#f8fafc', states: { hover: { color: palette.blue } }, dataLabels: { enabled: false }, name: 'Estudiantes' },
+                    { type: 'mappoint', name: 'Sede', color: '#064e3b', data: [{ name: 'Bogotá D.C.', lat: 4.6097, lon: -74.0817 }], marker: { lineWidth: 2, lineColor: '#ffffff', radius: 6 } }
+                ],
+                legend: { enabled: false }, tooltip: { headerFormat: '', pointFormat: '<b>{point.name}</b>: {point.value}' }
+            });
+        };
+
+        // Inicializar todo
+        document.addEventListener('DOMContentLoaded', () => {
+            initCounters();
+            initChartsObserver();
+            initMap();
         });
     </script>
 </body>
