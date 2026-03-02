@@ -221,10 +221,10 @@
             </div>
         </div>
 
-        <!-- Género -->
+        <!-- Sexo Biológico -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div class="card p-6 md:col-span-1 bg-white chart-container-hidden" data-chart="gender">
-                <h3 class="text-lg font-bold text-slate-800 mb-4 text-center">Género</h3>
+                <h3 class="text-lg font-bold text-slate-800 mb-4 text-center">Sexo Biológico</h3>
                 <div class="h-40 relative flex justify-center items-center">
                     <canvas id="genderChart"></canvas>
                     <div class="absolute flex flex-col items-center justify-center pointer-events-none">
